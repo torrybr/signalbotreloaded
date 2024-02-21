@@ -1,9 +1,10 @@
 import json
+from enum import Enum
 from typing import Union
 
 from pydantic import BaseModel
 
-from signalbot import MessageType, UnknownMessageFormatError
+from signalbot import UnknownMessageFormatError
 
 
 class Group(BaseModel):
@@ -32,6 +33,11 @@ class Reaction(BaseModel):
     recipient: str
     target_author: str
     timestamp: int
+
+
+class MessageType(Enum):
+    SYNC_MESSAGE = 1
+    DATA_MESSAGE = 2
 
 
 class Message(BaseModel):

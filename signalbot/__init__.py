@@ -1,8 +1,9 @@
 from .bot import SignalBot
 from .command import Command, CommandError, triggered
-from .message import Message, MessageType, UnknownMessageFormatError
 from .api import SignalAPI, ReceiveMessagesError, SendMessageError
+from .errors import UnknownMessageFormatError
 from .context import Context
+from .models import Message, MessageType
 
 __all__ = [
     "SignalBot",

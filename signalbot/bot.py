@@ -1,7 +1,6 @@
 import asyncio
 from collections import defaultdict
 import time
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
 import traceback
 from typing import Optional, Union, List, Callable
@@ -12,6 +11,8 @@ from .command import Command
 from .message import Message, UnknownMessageFormatError
 from .storage import RedisStorage, InMemoryStorage
 from .context import Context
+
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 
 class SignalBot:
@@ -134,11 +135,11 @@ class SignalBot:
         self.group_chats.add(internal_id)
 
     def register(
-        self,
-        command: Command,
-        contacts: Optional[Union[List[str], bool]] = True,
-        groups: Optional[Union[List[str], bool]] = True,
-        f: Optional[Callable[[Message], bool]] = None,
+            self,
+            command: Command,
+            contacts: Optional[Union[List[str], bool]] = True,
+            groups: Optional[Union[List[str], bool]] = True,
+            f: Optional[Callable[[Message], bool]] = None,
     ):
         command.bot = self
         command.setup()
@@ -172,17 +173,17 @@ class SignalBot:
         self._event_loop.run_forever()
 
     async def send(
-        self,
-        receiver: str,
-        text: str,
-        base64_attachments: list = None,
-        quote_author: str = None,
-        quote_mentions: list = None,
-        quote_message: str = None,
-        quote_timestamp: str = None,
-        mentions: list = None,
-        text_mode: str = None,
-        listen: bool = False,
+            self,
+            receiver: str,
+            text: str,
+            base64_attachments: list = None,
+            quote_author: str = None,
+            quote_mentions: list = None,
+            quote_message: str = None,
+            quote_timestamp: str = None,
+            mentions: list = None,
+            text_mode: str = None,
+            listen: bool = False,
     ) -> int:
         receiver = self._resolve_receiver(receiver)
         resp = await self._signal.send(
@@ -312,11 +313,11 @@ class SignalBot:
     async def _produce_consume_messages(self, producers=1, consumers=3) -> None:
         for n in range(1, producers + 1):
             produce_task = self._rerun_on_exception(self._produce, n)
-            asyncio.create_task(produce_task)
+            await asyncio.create_task(produce_task)
 
         for n in range(1, consumers + 1):
             consume_task = self._rerun_on_exception(self._consume, n)
-            asyncio.create_task(consume_task)
+            await asyncio.create_task(consume_task)
 
     async def _produce(self, name: int) -> None:
         logging.info(f"[Bot] Producer #{name} started")
@@ -336,10 +337,10 @@ class SignalBot:
             raise SignalBotError(f"Cannot receive messages: {e}")
 
     def _should_react_for_contact(
-        self,
-        message: Message,
-        contacts: list[str] | bool,
-        group_ids: list[str] | bool,
+            self,
+            message: Message,
+            contacts: bool,
+            group_ids: list[str],
     ):
         """Is the command activated for a certain chat or group?"""
 
@@ -377,9 +378,9 @@ class SignalBot:
         return False
 
     def _should_react_for_lambda(
-        self,
-        message: Message,
-        f: Callable[[Message], bool] | None,
+            self,
+            message: Message,
+            f: None,
     ) -> bool:
         if f is None:
             return True
@@ -407,7 +408,7 @@ class SignalBot:
     async def _consume_new_item(self, name: int) -> None:
         command, message, t = await self._q.get()
         now = time.perf_counter()
-        logging.info(f"[Bot] Consumer #{name} got new job in {now-t:0.5f} seconds")
+        logging.info(f"[Bot] Consumer #{name} got new job in {now - t:0.5f} seconds")
 
         # handle Command
         try:

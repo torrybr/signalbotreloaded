@@ -10,11 +10,11 @@ __all__ = [
     "Command",
     "CommandError",
     "triggered",
-    "Message",
     "SignalAPI",
     "ReceiveMessagesError",
     "SendMessageError",
     "Context",
     "MessageType",
     "UnknownMessageFormatError",
+    "Message",
 ]

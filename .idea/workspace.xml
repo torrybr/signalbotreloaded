@@ -5,10 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f869dc60-2198-4aed-8eab-ff0842cb5f32" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.pre-commit-config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/.pre-commit-config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signalbot/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/signalbot/bot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signalbot/command.py" beforeDir="false" afterPath="$PROJECT_DIR$/signalbot/command.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signalbot/context.py" beforeDir="false" afterPath="$PROJECT_DIR$/signalbot/context.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signalbot/message.py" beforeDir="false" afterPath="$PROJECT_DIR$/signalbot/message.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signalbot/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/signalbot/models.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +41,7 @@
     "Python.api.executor": "Run",
     "Python.bot.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "fix/build-errors",
+    "git-widget-placeholder": "dev",
     "last_opened_file_path": "/Users/torrybrelsford/Documents/github/signalbotreloaded",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.stylelint": "true",

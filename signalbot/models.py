@@ -40,12 +40,10 @@ class Message(BaseModel):
     type: MessageType
     text: str
     base64_attachments: list = []
-    sticker: str = None
     group: str = None
     reaction: str = None
     mentions: list[Mention] = []
     raw_message: str = None
-    recipients: list = []
 
     def recipient(self) -> str:
         if self.group:

@@ -1,5 +1,5 @@
 # from .bot import Signalbot # TODO: figure out how to enable this for typing
-from .message import Message
+from .models import Message
 
 
 class Context:

@@ -1,11 +1,12 @@
 import asyncio
 from collections import defaultdict
 import time
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import logging
 import traceback
 from typing import Optional, Union, List, Callable
 import re
+
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
@@ -338,8 +339,8 @@ class SignalBot:
     def _should_react_for_contact(
         self,
         message: Message,
-        contacts: list[str] | bool,
-        group_ids: list[str] | bool,
+        contacts: bool,
+        group_ids: list[str],
     ):
         """Is the command activated for a certain chat or group?"""
 
@@ -379,7 +380,7 @@ class SignalBot:
     def _should_react_for_lambda(
         self,
         message: Message,
-        f: Callable[[Message], bool] | None,
+        f: None,
     ) -> bool:
         if f is None:
             return True

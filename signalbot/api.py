@@ -1,6 +1,8 @@
 import aiohttp
 import websockets
 
+from signalbot.pattern.models.models import Group
+
 
 class SignalAPI:
     def __init__(
@@ -125,13 +127,15 @@ class SignalAPI:
         ):
             raise StopTypingError
 
-    async def get_groups(self):
+    async def get_groups(self) -> list[Group]:
         uri = self._groups_uri()
         try:
             async with aiohttp.ClientSession() as session:
                 resp = await session.get(uri)
                 resp.raise_for_status()
-                return await resp.json()
+                groups_data = await resp.json()
+                return [Group(**group) for group in groups_data]
+
         except (
             aiohttp.ClientError,
             aiohttp.http_exceptions.HttpProcessingError,

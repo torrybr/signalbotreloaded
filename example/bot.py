@@ -1,4 +1,3 @@
-import os
 from signalbot import SignalBot
 from commands import (
     PingCommand,
@@ -14,8 +13,8 @@ logging.getLogger("apscheduler").setLevel(logging.WARNING)
 
 
 def main():
-    signal_service = os.environ["SIGNAL_SERVICE"]
-    phone_number = os.environ["PHONE_NUMBER"]
+    signal_service = "localhost:8080"
+    phone_number = "+15157838691"
 
     config = {
         "signal_service": signal_service,

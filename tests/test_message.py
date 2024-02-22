@@ -8,10 +8,10 @@ class TestMessage(unittest.TestCase):
     raw_reaction_message = '{"envelope":{"source":"<source>","sourceNumber":"<source>","sourceUuid":"<uuid>","sourceName":"<name>","sourceDevice":1,"timestamp":1632576001632,"syncMessage":{"sentMessage":{"timestamp":1632576001632,"message":null,"expiresInSeconds":0,"viewOnce":false,"reaction":{"emoji":"👍","targetAuthor":"<target>","targetAuthorNumber":"<target>","targetAuthorUuid":"<uuid>","targetSentTimestamp":1632576001632,"isRemove":false},"mentions":[],"attachments":[],"contacts":[],"groupInfo":{"groupId":"<groupid>","type":"DELIVER"},"destination":null,"destinationNumber":null,"destinationUuid":null}}}}'  # noqa
     raw_user_chat_message = '{"envelope":{"source":"+490123456789","sourceNumber":"+490123456789","sourceUuid":"<uuid>","sourceName":"<name>","sourceDevice":1,"timestamp":1632576001632,"dataMessage":{"timestamp":1632576001632,"message":"Uhrzeit","expiresInSeconds":0,"viewOnce":false}},"account":"+49987654321","subscription":0}'  # noqa
 
-    expected_source = "+490123456789"
+    expected_source = '+490123456789'
     expected_timestamp = 1632576001632
-    expected_text = "Uhrzeit"
-    expected_group = "<groupid>"
+    expected_text = 'Uhrzeit'
+    expected_group = '<groupid>'
 
     # Own Message
     def test_parse_source_own_message(self):
@@ -57,7 +57,7 @@ class TestMessage(unittest.TestCase):
 
     def test_read_reaction(self):
         message = Message.parse(TestMessage.raw_reaction_message)
-        self.assertEqual(message.reaction, "👍")
+        self.assertEqual(message.reaction, '👍')
 
     # User Chats
     def test_parse_user_chat_message(self):
@@ -68,5 +68,5 @@ class TestMessage(unittest.TestCase):
         self.assertIsNone(message.group)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

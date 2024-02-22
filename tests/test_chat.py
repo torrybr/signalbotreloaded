@@ -12,7 +12,7 @@ from signalbot.utils import (
 
 
 class ChingChangChongCommand(Command):
-    triggers = ["ching", "chang"]
+    triggers = ['ching', 'chang']
 
     def __init__(self, listen):
         self.listen = listen
@@ -22,14 +22,14 @@ class ChingChangChongCommand(Command):
             return
 
         text = c.message.text
-        if text == "ching":
+        if text == 'ching':
             await asyncio.sleep(1)
-            await c.send("chang", listen=self.listen)
+            await c.send('chang', listen=self.listen)
             return
 
-        if text == "chang":
+        if text == 'chang':
             await asyncio.sleep(1)
-            await c.send("chong")
+            await c.send('chong')
             return
 
 
@@ -71,6 +71,6 @@ class ChingChangChongCommand(Command):
 #         self.assertEqual(replies.call_count, 2)
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level="INFO")
+if __name__ == '__main__':
+    logging.basicConfig(level='INFO')
     unittest.main()

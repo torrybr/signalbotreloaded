@@ -5,9 +5,9 @@ from .triggered import TriggeredCommand
 from .reply import ReplyCommand
 
 __all__ = [
-    "PingCommand",
-    "FridayCommand",
-    "TypingCommand",
-    "TriggeredCommand",
-    "ReplyCommand",
+    'PingCommand',
+    'FridayCommand',
+    'TypingCommand',
+    'TriggeredCommand',
+    'ReplyCommand',
 ]

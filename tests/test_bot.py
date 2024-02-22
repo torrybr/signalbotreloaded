@@ -5,21 +5,21 @@ from signalbot import SignalBot, Command, SignalAPI
 
 
 class BotTestCase(unittest.IsolatedAsyncioTestCase):
-    signal_service = "127.0.0.1:8080"
-    phone_number = "+49123456789"
-    group_id = "group.group_secret1="
-    internal_id = "group_id1="
+    signal_service = '127.0.0.1:8080'
+    phone_number = '+49123456789'
+    group_id = 'group.group_secret1='
+    internal_id = 'group_id1='
 
     def setUp(self):
         config = {
-            "signal_service": BotTestCase.signal_service,
-            "phone_number": BotTestCase.phone_number,
+            'signal_service': BotTestCase.signal_service,
+            'phone_number': BotTestCase.phone_number,
         }
         self.signal_bot = SignalBot(config)
 
 
 class TestProducer(BotTestCase):
-    @patch("websockets.connect")
+    @patch('websockets.connect')
     async def test_produce(self, mock):
         # Two messages
         message1 = '{"envelope":{"source":"+4901234567890","sourceNumber":"+4901234567890","sourceUuid":"asdf","sourceName":"name","sourceDevice":1,"timestamp":1633169000000,"syncMessage":{"sentMessage":{"timestamp":1633169000000,"message":"Message 1","expiresInSeconds":0,"viewOnce":false,"mentions":[],"attachments":[],"contacts":[],"groupInfo":{"groupId":"group_id1=","type":"DELIVER"},"destination":null,"destinationNumber":null,"destinationUuid":null}}}}'  # noqa
@@ -45,21 +45,21 @@ class TestProducer(BotTestCase):
 
 class TestListenUser(BotTestCase):
     def test_listen_phone_number(self):
-        user_number = "+49987654321"
+        user_number = '+49987654321'
         self.signal_bot.listen(user_number)
         expected_user_chats = {user_number}
         self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
 
     def test_listenUser_phone_number(self):
-        user_number = "+49987654321"
+        user_number = '+49987654321'
         self.signal_bot.listenUser(user_number)
         expected_user_chats = {user_number}
         self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
 
     def test_listen_multiple_user_chats(self):
-        user_number1 = "+49987654321"
-        user_number2 = "+49987654322"
-        user_number3 = "+49987654323"
+        user_number1 = '+49987654321'
+        user_number2 = '+49987654322'
+        user_number3 = '+49987654323'
         self.signal_bot.listen(user_number1)
         self.signal_bot.listen(user_number2)
         self.signal_bot.listen(user_number3)
@@ -67,9 +67,9 @@ class TestListenUser(BotTestCase):
         self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
 
     def test_listenUser_multiple_user_chats(self):
-        user_number1 = "+49987654321"
-        user_number2 = "+49987654322"
-        user_number3 = "+49987654323"
+        user_number1 = '+49987654321'
+        user_number2 = '+49987654322'
+        user_number3 = '+49987654323'
         self.signal_bot.listenUser(user_number1)
         self.signal_bot.listenUser(user_number2)
         self.signal_bot.listenUser(user_number3)
@@ -77,20 +77,20 @@ class TestListenUser(BotTestCase):
         self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
 
     def test_listen_invalid_phone_number(self):
-        invalid_number = "49987654321"
+        invalid_number = '49987654321'
         self.signal_bot.listen(invalid_number)
         expected_user_chats = set()
         self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
 
     def test_listenUser_invalid_phone_number(self):
-        invalid_number = "49987654321"
+        invalid_number = '49987654321'
         self.signal_bot.listenUser(invalid_number)
         expected_user_chats = set()
         self.assertSetEqual(self.signal_bot.user_chats, expected_user_chats)
 
     def test_listen_valid_invalid_phone_number(self):
-        invalid_number = "49987654321"
-        valid_number = "+49123454321"
+        invalid_number = '49987654321'
+        valid_number = '+49123454321'
         self.signal_bot.listen(invalid_number)
         self.signal_bot.listen(valid_number)
         expected_user_chats = {valid_number}

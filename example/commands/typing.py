@@ -1,5 +1,6 @@
 import asyncio
-from signalbot import Command, Context
+from signalbot.command import Command
+from signalbot.context import Context
 
 
 class TypingCommand(Command):
@@ -7,9 +8,9 @@ class TypingCommand(Command):
         return None
 
     async def handle(self, c: Context):
-        if c.message.text == "typing":
+        if c.message.text == 'typing':
             await c.start_typing()
             seconds = 5
             await asyncio.sleep(seconds)
             await c.stop_typing()
-            await c.send(f"Typed for {seconds}s")
+            await c.send(f'Typed for {seconds}s')

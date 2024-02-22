@@ -13,13 +13,20 @@ from unittest.mock import patch
 
 def chat(*messages):
     def decorator_chat(func):
-        signalbot_package = ".".join(__package__.split(".")[:-1])
+        signalbot_package = '.'.join(__package__.split('.')[:-1])
 
         @functools.wraps(func)
-        @patch(f"{signalbot_package}.SignalAPI.react", new_callable=ReactMessageMock)
-        @patch(f"{signalbot_package}.SignalAPI.send", new_callable=SendMessagesMock)
         @patch(
-            f"{signalbot_package}.SignalAPI.receive", new_callable=ReceiveMessagesMock
+            f'{signalbot_package}.SignalAPI.react',
+            new_callable=ReactMessageMock,
+        )
+        @patch(
+            f'{signalbot_package}.SignalAPI.send',
+            new_callable=SendMessagesMock,
+        )
+        @patch(
+            f'{signalbot_package}.SignalAPI.receive',
+            new_callable=ReceiveMessagesMock,
         )
         async def wrapper_chat(*args, **kwargs):
             chat_test_case = args[0]
@@ -37,19 +44,21 @@ def chat(*messages):
 
 
 class ChatTestCase(unittest.IsolatedAsyncioTestCase):
-    signal_service = "127.0.0.1:8080"
-    phone_number = "+49123456789"
+    signal_service = '127.0.0.1:8080'
+    phone_number = '+49123456789'
 
-    group_id = "group_id1="
-    group_secret = "group.group_secret1="
+    group_id = 'group_id1='
+    group_secret = 'group.group_secret1='
     config = {
-        "signal_service": signal_service,
-        "phone_number": phone_number,
+        'signal_service': signal_service,
+        'phone_number': phone_number,
     }
 
     def setUp(self):
         self.signal_bot = SignalBot(ChatTestCase.config)
-        self.signal_bot.listen(ChatTestCase.group_id, ChatTestCase.group_secret)
+        self.signal_bot.listen(
+            ChatTestCase.group_id, ChatTestCase.group_secret
+        )
 
     async def run_bot(self):
         PRODUCER_ID = 1337
@@ -63,29 +72,29 @@ class ChatTestCase(unittest.IsolatedAsyncioTestCase):
         timestamp = time.time()
         new_uuid = str(uuid.uuid4())
         message = {
-            "envelope": {
-                "source": ChatTestCase.phone_number,
-                "sourceNumber": ChatTestCase.phone_number,
-                "sourceUuid": new_uuid,
-                "sourceName": "some_source_name",
-                "sourceDevice": 1,
-                "timestamp": timestamp,
-                "syncMessage": {
-                    "sentMessage": {
-                        "timestamp": timestamp,
-                        "message": text,
-                        "expiresInSeconds": 0,
-                        "viewOnce": False,
-                        "mentions": [],
-                        "attachments": [],
-                        "contacts": [],
-                        "groupInfo": {
-                            "groupId": ChatTestCase.group_id,
-                            "type": "DELIVER",
+            'envelope': {
+                'source': ChatTestCase.phone_number,
+                'sourceNumber': ChatTestCase.phone_number,
+                'sourceUuid': new_uuid,
+                'sourceName': 'some_source_name',
+                'sourceDevice': 1,
+                'timestamp': timestamp,
+                'syncMessage': {
+                    'sentMessage': {
+                        'timestamp': timestamp,
+                        'message': text,
+                        'expiresInSeconds': 0,
+                        'viewOnce': False,
+                        'mentions': [],
+                        'attachments': [],
+                        'contacts': [],
+                        'groupInfo': {
+                            'groupId': ChatTestCase.group_id,
+                            'type': 'DELIVER',
                         },
-                        "destination": None,
-                        "destinationNumber": None,
-                        "destinationUuid": None,
+                        'destination': None,
+                        'destinationNumber': None,
+                        'destinationUuid': None,
                     }
                 },
             }
@@ -105,7 +114,7 @@ class SendMessagesMock(AsyncMock):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         mock = AsyncMock()
-        mock.return_value = {"timestamp": "1638715559464"}
+        mock.return_value = {'timestamp': '1638715559464'}
         self.return_value = AsyncMock(
             spec=aiohttp.ClientResponse,
             status_code=201,

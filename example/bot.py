@@ -7,7 +7,7 @@ import logging
 from signalbot.bot import SignalBot
 
 logging.getLogger().setLevel(logging.INFO)
-logging.getLogger("apscheduler").setLevel(logging.WARNING)
+logging.getLogger('apscheduler').setLevel(logging.WARNING)
 
 
 def main():
@@ -15,9 +15,9 @@ def main():
     phone_number = '+15157838691'
 
     config = {
-        "signal_service": signal_service,
-        "phone_number": phone_number,
-        "storage": None,
+        'signal_service': signal_service,
+        'phone_number': phone_number,
+        'storage': None,
     }
     bot = SignalBot(config)
 
@@ -37,5 +37,5 @@ def main():
     bot.start()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

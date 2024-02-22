@@ -7,9 +7,9 @@ from .chat_testing import (
 )
 
 __all__ = [
-    "ChatTestCase",
-    "SendMessagesMock",
-    "ReceiveMessagesMock",
-    "ReactMessageMock",
-    "chat",
+    'ChatTestCase',
+    'SendMessagesMock',
+    'ReceiveMessagesMock',
+    'ReactMessageMock',
+    'chat',
 ]

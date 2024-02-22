@@ -1,8 +1,14 @@
 import aiohttp
 import websockets
 
-from signalbot.errors import GroupsError, StopTypingError, StartTypingError, SendMessageError, ReactionError, \
-    ReceiveMessagesError
+from signalbot.errors import (
+    GroupsError,
+    StopTypingError,
+    StartTypingError,
+    SendMessageError,
+    ReactionError,
+    ReceiveMessagesError,
+)
 from signalbot.models import Group, Reaction
 
 
@@ -46,24 +52,24 @@ class SignalAPI:
             base64_attachments = []
 
         payload = {
-            "base64_attachments": base64_attachments,
-            "message": message,
-            "number": self.phone_number,
-            "recipients": [receiver],
+            'base64_attachments': base64_attachments,
+            'message': message,
+            'number': self.phone_number,
+            'recipients': [receiver],
         }
 
         if quote_author:
-            payload["quote_author"] = quote_author
+            payload['quote_author'] = quote_author
         if quote_mentions:
-            payload["quote_mentions"] = quote_mentions
+            payload['quote_mentions'] = quote_mentions
         if quote_message:
-            payload["quote_message"] = quote_message
+            payload['quote_message'] = quote_message
         if quote_timestamp:
-            payload["quote_timestamp"] = quote_timestamp
+            payload['quote_timestamp'] = quote_timestamp
         if mentions:
-            payload["mentions"] = mentions
+            payload['mentions'] = mentions
         if text_mode:
-            payload["text_mode"] = text_mode
+            payload['text_mode'] = text_mode
 
         try:
             async with aiohttp.ClientSession() as session:
@@ -77,9 +83,7 @@ class SignalAPI:
         ):
             raise SendMessageError
 
-    async def react(
-        self, reaction: Reaction
-    ) -> aiohttp.ClientResponse:
+    async def react(self, reaction: Reaction) -> aiohttp.ClientResponse:
         uri = self._react_rest_uri()
         try:
             async with aiohttp.ClientSession() as session:
@@ -95,7 +99,7 @@ class SignalAPI:
     async def start_typing(self, receiver: str):
         uri = self._typing_indicator_uri()
         payload = {
-            "recipient": receiver,
+            'recipient': receiver,
         }
         try:
             async with aiohttp.ClientSession() as session:
@@ -111,7 +115,7 @@ class SignalAPI:
     async def stop_typing(self, receiver: str):
         uri = self._typing_indicator_uri()
         payload = {
-            "recipient": receiver,
+            'recipient': receiver,
         }
         try:
             async with aiohttp.ClientSession() as session:
@@ -138,18 +142,16 @@ class SignalAPI:
             raise GroupsError
 
     def _receive_ws_uri(self):
-        return f"ws://{self.signal_service}/v1/receive/{self.phone_number}"
+        return f'ws://{self.signal_service}/v1/receive/{self.phone_number}'
 
     def _send_rest_uri(self):
-        return f"http://{self.signal_service}/v2/send"
+        return f'http://{self.signal_service}/v2/send'
 
     def _react_rest_uri(self):
-        return f"http://{self.signal_service}/v1/reactions/{self.phone_number}"
+        return f'http://{self.signal_service}/v1/reactions/{self.phone_number}'
 
     def _typing_indicator_uri(self):
-        return f"http://{self.signal_service}/v1/typing-indicator/{self.phone_number}"
+        return f'http://{self.signal_service}/v1/typing-indicator/{self.phone_number}'
 
     def _groups_uri(self):
-        return f"http://{self.signal_service}/v1/groups/{self.phone_number}"
-
-
+        return f'http://{self.signal_service}/v1/groups/{self.phone_number}'

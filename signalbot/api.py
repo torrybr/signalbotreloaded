@@ -1,7 +1,9 @@
 import aiohttp
 import websockets
 
-from signalbot.models import Group
+from signalbot.errors import GroupsError, StopTypingError, StartTypingError, SendMessageError, ReactionError, \
+    ReceiveMessagesError
+from signalbot.models import Group, Reaction
 
 
 class SignalAPI:
@@ -12,6 +14,7 @@ class SignalAPI:
     ):
         self.signal_service = signal_service
         self.phone_number = phone_number
+        self.connection = None
 
         # self.session = aiohttp.ClientSession()
 
@@ -75,18 +78,12 @@ class SignalAPI:
             raise SendMessageError
 
     async def react(
-        self, recipient: str, reaction: str, target_author: str, timestamp: int
+        self, reaction: Reaction
     ) -> aiohttp.ClientResponse:
         uri = self._react_rest_uri()
-        payload = {
-            "recipient": recipient,
-            "reaction": reaction,
-            "target_author": target_author,
-            "timestamp": timestamp,
-        }
         try:
             async with aiohttp.ClientSession() as session:
-                resp = await session.post(uri, json=payload)
+                resp = await session.post(uri, json=reaction)
                 resp.raise_for_status()
                 return resp
         except (
@@ -156,29 +153,3 @@ class SignalAPI:
         return f"http://{self.signal_service}/v1/groups/{self.phone_number}"
 
 
-class ReceiveMessagesError(Exception):
-    pass
-
-
-class SendMessageError(Exception):
-    pass
-
-
-class TypingError(Exception):
-    pass
-
-
-class StartTypingError(TypingError):
-    pass
-
-
-class StopTypingError(TypingError):
-    pass
-
-
-class ReactionError(Exception):
-    pass
-
-
-class GroupsError(Exception):
-    pass

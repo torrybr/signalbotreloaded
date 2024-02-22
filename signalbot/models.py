@@ -149,3 +149,17 @@ class Message(BaseModel):
             return reaction
         except Exception:
             return None
+
+
+class SendMessage(BaseModel):
+    base64_attachments: list[str] = []
+    mentions: list[Mention] = []
+    message: str
+    number: str
+    quote_author: str = None
+    quote_mentions: list[Mention] = []
+    quote_message: str = None
+    quote_timestamp: str = None
+    recipients: list[str]
+    sticker: str = None
+    text_mode: str = 'normal'

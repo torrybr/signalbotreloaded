@@ -8,7 +8,7 @@ import re
 
 from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
-from .models import Message
+from .models import Message, Reaction
 from .storage import RedisStorage, InMemoryStorage
 from .context import Context
 from .errors import UnknownMessageFormatError
@@ -207,13 +207,12 @@ class SignalBot:
 
         return timestamp
 
-    async def react(self, message: Message, emoji: str):
+    async def react(self, message: Message, emoji: str) -> None:
         # TODO: check that emoji is really an emoji
-        recipient = message.recipient()
-        recipient = self._resolve_receiver(recipient)
-        target_author = message.source
-        timestamp = message.timestamp
-        await self._signal.react(recipient, emoji, target_author, timestamp)
+        recipient = self._resolve_receiver(message.recipient())
+        # I doubt this should be the message timestamp .. should be the time sent
+        reaction = Reaction(recipient=recipient, emoji=emoji, target_author=message.source, timestamp=message.timestamp)
+        await self._signal.react(reaction)
         logging.info(f"[Bot] New reaction: {emoji}")
 
     async def start_typing(self, receiver: str):

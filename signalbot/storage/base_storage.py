@@ -24,7 +24,7 @@ class BaseStorage:
         pass
 
     @abstractmethod
-    def read(self, key: str):
+    def find(self, key: str):
         pass
 
     @abstractmethod

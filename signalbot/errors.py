@@ -1,0 +1,2 @@
+class UnknownMessageFormatError(Exception):
+    pass

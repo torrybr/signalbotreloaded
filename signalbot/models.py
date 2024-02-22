@@ -1,9 +1,10 @@
 import json
+from enum import Enum
 from typing import Union
 
 from pydantic import BaseModel
 
-from signalbot import MessageType, UnknownMessageFormatError
+from signalbot import UnknownMessageFormatError
 
 
 class Group(BaseModel):
@@ -34,18 +35,21 @@ class Reaction(BaseModel):
     timestamp: int
 
 
+class MessageType(Enum):
+    SYNC_MESSAGE = 1
+    DATA_MESSAGE = 2
+
+
 class Message(BaseModel):
     source: str
     timestamp: int
     type: MessageType
     text: str
     base64_attachments: list = []
-    sticker: str = None
     group: str = None
     reaction: str = None
     mentions: list[Mention] = []
     raw_message: str = None
-    recipients: list = []
 
     def recipient(self) -> str:
         if self.group:

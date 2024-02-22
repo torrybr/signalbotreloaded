@@ -1,6 +1,6 @@
 import functools
 
-from .message import Message
+from .models import Message
 from .context import Context
 
 

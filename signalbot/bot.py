@@ -8,7 +8,7 @@ import re
 
 from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
-from .message import Message, UnknownMessageFormatError
+from .models import Message, UnknownMessageFormatError
 from .storage import RedisStorage, InMemoryStorage
 from .context import Context
 

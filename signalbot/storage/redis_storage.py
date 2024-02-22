@@ -17,15 +17,15 @@ class RedisStorage(BaseStorage):
     def find(self, key: str) -> Any:
         try:
             result_bytes = self._redis.get(key)
-            result_str = result_bytes.decode("utf-8")
+            result_str = result_bytes.decode('utf-8')
             result_dict = json.loads(result_str)
             return result_dict
         except Exception as e:
-            raise StorageError(f"Redis load failed: {e}")
+            raise StorageError(f'Redis load failed: {e}')
 
     def save(self, key: str, object: Any):
         try:
             object_str = json.dumps(object)
             self._redis.set(key, object_str)
         except Exception as e:
-            raise StorageError(f"Redis save failed: {e}")
+            raise StorageError(f'Redis save failed: {e}')

@@ -18,11 +18,11 @@ class InMemoryStorage(BaseStorage):
             result_dict = json.loads(result_str)
             return result_dict
         except Exception as e:
-            raise StorageError(f"InMemory load failed: {e}")
+            raise StorageError(f'InMemory load failed: {e}')
 
     def save(self, key: str, object: Any):
         try:
             object_str = json.dumps(object)
             self._storage[key] = object_str
         except Exception as e:
-            raise StorageError(f"InMemory save failed: {e}")
+            raise StorageError(f'InMemory save failed: {e}')

@@ -4,17 +4,18 @@ from typing import Union
 
 from pydantic import BaseModel
 
-from signalbot import UnknownMessageFormatError
+from signalbot.errors import UnknownMessageFormatError
 
 
 class Group(BaseModel):
     id: str
     internal_id: str
     name: str
-    members: list
-    admins: list = []
-    pending_invites: list = []
-    pending_requests: list = []
+    members: list[str] = []
+    admins: list[str] = []
+    pending_invites: list[str] = []
+    pending_requests: list[str] = []
+    blocked: bool = False
 
 
 class Mention(BaseModel):

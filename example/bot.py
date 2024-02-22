@@ -1,21 +1,18 @@
-import os
-from signalbot import SignalBot
 from commands import (
     PingCommand,
-    FridayCommand,
-    TypingCommand,
-    TriggeredCommand,
     ReplyCommand,
 )
 import logging
+
+from signalbot.bot import SignalBot
 
 logging.getLogger().setLevel(logging.INFO)
 logging.getLogger("apscheduler").setLevel(logging.WARNING)
 
 
 def main():
-    signal_service = os.environ["SIGNAL_SERVICE"]
-    phone_number = os.environ["PHONE_NUMBER"]
+    signal_service = 'localhost:8080'
+    phone_number = '+15157838691'
 
     config = {
         "signal_service": signal_service,
@@ -29,13 +26,13 @@ def main():
     bot.register(ReplyCommand())
 
     # enable a chat command only for groups
-    bot.register(FridayCommand(), contacts=False, groups=True)
-
-    # enable a chat command for one specific group with the name "My Group"
-    bot.register(TypingCommand(), groups=["My Group"])
-
-    # chat command is enabled for all groups and one specific contact
-    bot.register(TriggeredCommand(), contacts=["+490123456789"], groups=True)
+    # bot.register(FridayCommand(), contacts=False, groups=True)
+    #
+    # # enable a chat command for one specific group with the name "My Group"
+    # bot.register(TypingCommand(), groups=["My Group"])
+    #
+    # # chat command is enabled for all groups and one specific contact
+    # bot.register(TriggeredCommand(), contacts=["+490123456789"], groups=True)
 
     bot.start()
 

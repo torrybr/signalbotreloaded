@@ -5,7 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f869dc60-2198-4aed-8eab-ff0842cb5f32" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/example/bot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/commands/friday.py" beforeDir="false" afterPath="$PROJECT_DIR$/example/commands/friday.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/commands/ping.py" beforeDir="false" afterPath="$PROJECT_DIR$/example/commands/ping.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/commands/reply.py" beforeDir="false" afterPath="$PROJECT_DIR$/example/commands/reply.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/commands/styles.py" beforeDir="false" afterPath="$PROJECT_DIR$/example/commands/styles.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/commands/triggered.py" beforeDir="false" afterPath="$PROJECT_DIR$/example/commands/triggered.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/commands/typing.py" beforeDir="false" afterPath="$PROJECT_DIR$/example/commands/typing.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/signalbot/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/signalbot/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signalbot/api.py" beforeDir="false" afterPath="$PROJECT_DIR$/signalbot/api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signalbot/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/signalbot/bot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signalbot/command.py" beforeDir="false" afterPath="$PROJECT_DIR$/signalbot/command.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/signalbot/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/signalbot/models.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,9 +46,10 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Python.api.executor": "Run",
-    "Python.bot.executor": "Run",
+    "Python.bot.executor": "Debug",
+    "Python.command.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "refactor/message-model",
+    "git-widget-placeholder": "dev",
     "last_opened_file_path": "/Users/torrybrelsford/Documents/github/signalbotreloaded",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.stylelint": "true",
@@ -74,8 +87,27 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/signalbot/bot.py</url>
+          <line>233</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/signalbotreloaded$api.coverage" NAME="api Coverage Results" MODIFIED="1708554932265" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/signalbot" />
-    <SUITE FILE_PATH="coverage/signalbotreloaded$bot.coverage" NAME="bot Coverage Results" MODIFIED="1708554939162" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/example" />
+    <SUITE FILE_PATH="coverage/signalbotreloaded$command.coverage" NAME="command Coverage Results" MODIFIED="1708607693084" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/signalbot" />
+    <SUITE FILE_PATH="coverage/signalbotreloaded$bot.coverage" NAME="bot Coverage Results" MODIFIED="1708608030626" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/example" />
   </component>
 </project>

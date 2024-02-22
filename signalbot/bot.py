@@ -8,9 +8,10 @@ import re
 
 from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
-from .models import Message, UnknownMessageFormatError
+from .models import Message
 from .storage import RedisStorage, InMemoryStorage
 from .context import Context
+from .errors import UnknownMessageFormatError
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -223,7 +224,7 @@ class SignalBot:
         receiver = self._resolve_receiver(receiver)
         await self._signal.stop_typing(receiver)
 
-    async def _detect_groups(self):
+    async def _detect_groups(self) -> None:
         # reset group lookups to avoid stale data
         self.groups = await self._signal.get_groups()
 

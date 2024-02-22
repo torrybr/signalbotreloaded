@@ -1,7 +1,7 @@
 import functools
 
-from .models import Message
-from .context import Context
+from signalbot.context import Context
+from signalbot.models import Message
 
 
 def triggered(*by, case_sensitive=False):

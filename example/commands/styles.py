@@ -1,5 +1,8 @@
 import os
-from signalbot import SignalBot, Command, Context
+
+from signalbot.bot import SignalBot
+from signalbot.command import Command
+from signalbot.context import Context
 
 
 class StylesCommand(Command):

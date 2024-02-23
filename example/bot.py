@@ -1,9 +1,9 @@
+import logging
+
 from commands import (
     PingCommand,
     ReplyCommand,
 )
-import logging
-
 from signalbot.bot import SignalBot
 
 logging.getLogger().setLevel(logging.INFO)
@@ -17,7 +17,6 @@ def main():
     config = {
         'signal_service': signal_service,
         'phone_number': phone_number,
-        'storage': None,
     }
     bot = SignalBot(config)
 

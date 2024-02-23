@@ -28,3 +28,7 @@ class ReactionError(Exception):
 
 class GroupsError(Exception):
     pass
+
+
+class StorageError(Exception):
+    pass

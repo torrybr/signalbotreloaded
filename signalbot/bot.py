@@ -1,23 +1,24 @@
 import asyncio
-from collections import defaultdict
-import time
 import logging
-import traceback
-from typing import Optional, Union, List, Callable
 import re
-
-from .api import SignalAPI, ReceiveMessagesError
-from .command import Command
-from .models import Message, Reaction
-from .storage import RedisStorage, InMemoryStorage
-from .context import Context
-from .errors import UnknownMessageFormatError
+import time
+import traceback
+from collections import defaultdict
+from typing import Optional, Union, List, Callable
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+from .api import SignalAPI, ReceiveMessagesError
+from .command import Command
+from .context import Context
+from .errors import UnknownMessageFormatError
+from .models import Message, Reaction
+from .storage.base_storage import BaseStorage
+from .storage.memory_storage import InMemoryStorage
+
 
 class SignalBot:
-    def __init__(self, config: dict):
+    def __init__(self, config: dict, storage: BaseStorage = InMemoryStorage()):
         """SignalBot
 
         Example Config:
@@ -29,6 +30,8 @@ class SignalBot:
             redis_port: 6379
         """
         self.config = config
+
+        self.storage = storage
 
         self.commands = []  # populated by .register()
 
@@ -42,13 +45,11 @@ class SignalBot:
         self._groups_by_name = defaultdict(list)
 
         try:
-            self._phone_number = self.config['phone_number']
-            self._signal_service = self.config['signal_service']
+            self._phone_number = self.config["phone_number"]
+            self._signal_service = self.config["signal_service"]
             self._signal = SignalAPI(self._signal_service, self._phone_number)
         except KeyError:
-            raise SignalBotError(
-                'Could not initialize SignalAPI with given config'
-            )
+            raise SignalBotError("Could not initialize SignalAPI with given config")
 
         self._event_loop = asyncio.get_event_loop()
         self._q = asyncio.Queue()
@@ -56,24 +57,14 @@ class SignalBot:
         try:
             self.scheduler = AsyncIOScheduler(event_loop=self._event_loop)
         except Exception as e:
-            raise SignalBotError(f'Could not initialize scheduler: {e}')
-
-        try:
-            config_storage = self.config['storage']
-            self._redis_host = config_storage['redis_host']
-            self._redis_port = config_storage['redis_port']
-            self.storage = RedisStorage(self._redis_host, self._redis_port)
-        except Exception:
-            self.storage = InMemoryStorage()
-            logging.warning(
-                '[Bot] Could not initialize Redis. In-memory storage will be used. '
-                'Restarting will delete the storage!'
-            )
+            raise SignalBotError(f"Could not initialize scheduler: {e}")
 
     # deprecated
+
     def listen(self, required_id: str, optional_id: str = None):
         logging.warning(
-            '[Deprecation Warning] .listen is deprecated and will be removed in future versions. Please use .register'
+            "[Deprecation Warning] .listen is deprecated and will be removed in future versions. "
+            "Please use .register"
         )
 
         # Case 1: required id is a phone number, optional_id is not being used
@@ -83,18 +74,14 @@ class SignalBot:
             return
 
         # Case 2: required id is a group id
-        if self._is_group_id(required_id) and self._is_internal_id(
-            optional_id
-        ):
+        if self._is_group_id(required_id) and self._is_internal_id(optional_id):
             group_id = required_id
             internal_id = optional_id
             self._listenGroup(group_id, internal_id)
             return
 
         # Case 3: optional_id is a group id (Case 2 swapped)
-        if self._is_internal_id(required_id) and self._is_group_id(
-            optional_id
-        ):
+        if self._is_internal_id(required_id) and self._is_group_id(optional_id):
             group_id = optional_id
             internal_id = required_id
             self._listenGroup(group_id, internal_id)
@@ -107,7 +94,8 @@ class SignalBot:
     # deprecated
     def listenUser(self, phone_number: str):
         logging.warning(
-            '[Deprecation Warning] .listenUser is deprecated and will be removed in future versions. Please use .register'
+            "[Deprecation Warning] .listenUser is deprecated and will be removed in future versions. Please use "
+            ".register"
         )
         return self._listenUser(phone_number)
 
@@ -125,19 +113,18 @@ class SignalBot:
     # deprecated
     def listenGroup(self, group_id: str, internal_id: str = None):
         logging.warning(
-            '[Deprecation Warning] .listenGroup is deprecated and will be removed in future versions. Please use .register'
+            "[Deprecation Warning] .listenGroup is deprecated and will be removed in future versions. Please use "
+            ".register"
         )
         return self._listenGroup(group_id, internal_id)
 
     # deprecated
     def _listenGroup(self, group_id: str, internal_id: str = None):
         self._listen_mode_activated = True
-        if not (
-            self._is_group_id(group_id) and self._is_internal_id(internal_id)
-        ):
+        if not (self._is_group_id(group_id) and self._is_internal_id(internal_id)):
             logging.warning(
                 "[Bot] Can't listen for group because group id and "
-                'internal id do not look valid'
+                "internal id do not look valid"
             )
             return
 
@@ -161,13 +148,11 @@ class SignalBot:
         if isinstance(groups, list):
             group_ids = []
             for group in groups:
-                if self._is_group_id(
-                    group
-                ):  # group is a group id, higher prio
+                if self._is_group_id(group):  # group is a group id, higher prio
                     group_ids.append(group)
                 else:  # group is a group name
                     for matched_group in self._groups_by_name:
-                        group_ids.append(matched_group['id'])
+                        group_ids.append(matched_group["id"])
 
         self.commands.append((command, contacts, group_ids, f))
 
@@ -209,13 +194,11 @@ class SignalBot:
             text_mode=text_mode,
         )
         resp_payload = await resp.json()
-        timestamp = resp_payload['timestamp']
-        logging.info(f'[Bot] New message {timestamp} sent:\n{text}')
+        timestamp = resp_payload["timestamp"]
+        logging.info(f"[Bot] New message {timestamp} sent:\n{text}")
 
         if listen:
-            logging.warning(
-                f'[Bot] send(..., listen=True) is not supported anymore'
-            )
+            logging.warning("[Bot] send(..., listen=True) is not supported anymore")
 
         return timestamp
 
@@ -230,7 +213,7 @@ class SignalBot:
             timestamp=message.timestamp,
         )
         await self._signal.react(reaction)
-        logging.info(f'[Bot] New reaction: {emoji}')
+        logging.info(f"[Bot] New reaction: {emoji}")
 
     async def start_typing(self, receiver: str):
         receiver = self._resolve_receiver(receiver)
@@ -248,11 +231,11 @@ class SignalBot:
         self._groups_by_internal_id = {}
         self._groups_by_name = defaultdict(list)
         for group in self.groups:
-            self._groups_by_id[group['id']] = group
-            self._groups_by_internal_id[group['internal_id']] = group
-            self._groups_by_name[group['name']].append(group)
+            self._groups_by_id[group["id"]] = group
+            self._groups_by_internal_id[group["internal_id"]] = group
+            self._groups_by_name[group["name"]].append(group)
 
-        logging.info(f'[Bot] {len(self.groups)} groups detected')
+        logging.info(f"[Bot] {len(self.groups)} groups detected")
 
     def _resolve_receiver(self, receiver: str) -> str:
         if self._is_phone_number(receiver):
@@ -262,16 +245,16 @@ class SignalBot:
             return receiver
 
         try:
-            group_id = self._groups_by_internal_id[receiver]['id']
+            group_id = self._groups_by_internal_id[receiver]["id"]
             return group_id
 
         except Exception:
-            raise SignalBotError(f'Cannot resolve receiver.')
+            raise SignalBotError("Cannot resolve receiver.")
 
     def _is_phone_number(self, phone_number: str) -> bool:
         if phone_number is None:
             return False
-        if phone_number[0] != '+':
+        if phone_number[0] != "+":
             return False
         if len(phone_number[1:]) > 15:
             return False
@@ -289,12 +272,12 @@ class SignalBot:
         if group_id is None:
             return False
 
-        return re.match(r'^group\.[a-zA-Z0-9]{59}=$', group_id)
+        return re.match(r"^group\.[a-zA-Z0-9]{59}=$", group_id)
 
     def _is_internal_id(self, internal_id: str) -> bool:
         if internal_id is None:
             return False
-        return internal_id[-1] == '='
+        return internal_id[-1] == "="
 
     # see https://stackoverflow.com/questions/55184226/catching-exceptions-in-individual-tasks-and-restarting-them
     @classmethod
@@ -319,19 +302,15 @@ class SignalBot:
 
             if end_t - start_t < reset:
                 sleep_t = next_sleep
-                next_sleep = min(
-                    max_sleep, next_sleep * 2
-                )  # double sleep time
+                next_sleep = min(max_sleep, next_sleep * 2)  # double sleep time
             else:
                 next_sleep = init_sleep  # reset sleep time
                 sleep_t = next_sleep
 
-            logging.warning(f'Restarting coroutine in {sleep_t} seconds')
+            logging.warning(f"Restarting coroutine in {sleep_t} seconds")
             await asyncio.sleep(sleep_t)
 
-    async def _produce_consume_messages(
-        self, producers=1, consumers=3
-    ) -> None:
+    async def _produce_consume_messages(self, producers=1, consumers=3) -> None:
         for n in range(1, producers + 1):
             produce_task = self._rerun_on_exception(self._produce, n)
             await asyncio.create_task(produce_task)
@@ -341,10 +320,10 @@ class SignalBot:
             await asyncio.create_task(consume_task)
 
     async def _produce(self, name: int) -> None:
-        logging.info(f'[Bot] Producer #{name} started')
+        logging.info(f"[Bot] Producer #{name} started")
         try:
             async for raw_message in self._signal.receive():
-                logging.info(f'[Raw Message] {raw_message}')
+                logging.info(f"[Raw Message] {raw_message}")
 
                 try:
                     message = Message.parse(raw_message)
@@ -355,7 +334,7 @@ class SignalBot:
 
         except ReceiveMessagesError as e:
             # TODO: retry strategy
-            raise SignalBotError(f'Cannot receive messages: {e}')
+            raise SignalBotError(f"Cannot receive messages: {e}")
 
     def _should_react_for_contact(
         self,
@@ -392,14 +371,8 @@ class SignalBot:
                 return True
 
             # b) whitelisted group ids
-            group_id = self._groups_by_internal_id.get(message.group, {}).get(
-                'id'
-            )
-            if (
-                isinstance(group_ids, list)
-                and group_id
-                and group_id in group_ids
-            ):
+            group_id = self._groups_by_internal_id.get(message.group, {}).get("id")
+            if isinstance(group_ids, list) and group_id and group_id in group_ids:
                 return True
 
         return False
@@ -416,9 +389,7 @@ class SignalBot:
 
     async def _ask_commands_to_handle(self, message: Message):
         for command, contacts, group_ids, f in self.commands:
-            if not self._should_react_for_contact(
-                message, contacts, group_ids
-            ):
+            if not self._should_react_for_contact(message, contacts, group_ids):
                 continue
 
             if not self._should_react_for_lambda(message, f):
@@ -427,7 +398,7 @@ class SignalBot:
             await self._q.put((command, message, time.perf_counter()))
 
     async def _consume(self, name: int) -> None:
-        logging.info(f'[Bot] Consumer #{name} started')
+        logging.info(f"[Bot] Consumer #{name} started")
         while True:
             try:
                 await self._consume_new_item(name)
@@ -437,16 +408,14 @@ class SignalBot:
     async def _consume_new_item(self, name: int) -> None:
         command, message, t = await self._q.get()
         now = time.perf_counter()
-        logging.info(
-            f'[Bot] Consumer #{name} got new job in {now - t:0.5f} seconds'
-        )
+        logging.info(f"[Bot] Consumer #{name} got new job in {now - t:0.5f} seconds")
 
         # handle Command
         try:
             context = Context(self, message)
             await command.handle(context)
         except Exception as e:
-            logging.error(f'[{command.__class__.__name__}] Error: {e}')
+            logging.error(f"[{command.__class__.__name__}] Error: {e}")
             raise e
 
         # done

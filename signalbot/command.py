@@ -1,7 +1,6 @@
 import functools
 
 from signalbot.context import Context
-from signalbot.models import Message
 
 
 def triggered(*by, case_sensitive=False):
@@ -33,29 +32,9 @@ class Command:
         pass
 
     # optional
-    def describe(self) -> str:
+    def describe(self) -> None:
         return None
 
     # overwrite
     async def handle(self, context: Context):
         raise NotImplementedError
-
-    # helper method
-    # deprecated: please use @triggered
-    @classmethod
-    def triggered(cls, message: Message, trigger_words: list[str]) -> bool:
-        # Message needs to be text
-        text = message.text
-        if not isinstance(text, str):
-            return False
-
-        # Text must match trigger words without capitalization
-        text = text.lower()
-        if text in trigger_words:
-            return True
-
-        return False
-
-
-class CommandError(Exception):
-    pass

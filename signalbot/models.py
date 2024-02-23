@@ -80,32 +80,42 @@ class Message(BaseMessage):
 
         # General attributes
         try:
-            source = raw_message["envelope"]["source"]
-            timestamp = raw_message["envelope"]["timestamp"]
+            source = raw_message['envelope']['source']
+            timestamp = raw_message['envelope']['timestamp']
         except Exception:
             raise UnknownMessageFormatError
 
         # Option 1: syncMessage
-        if "syncMessage" in raw_message["envelope"]:
+        if 'syncMessage' in raw_message['envelope']:
             type = MessageType.SYNC_MESSAGE
-            text = cls._parse_sync_message(raw_message["envelope"]["syncMessage"])
+            text = cls._parse_sync_message(
+                raw_message['envelope']['syncMessage']
+            )
             group = cls._parse_group_information(
-                raw_message["envelope"]["syncMessage"]["sentMessage"]
+                raw_message['envelope']['syncMessage']['sentMessage']
             )
             reaction = cls._parse_reaction(
-                raw_message["envelope"]["syncMessage"]["sentMessage"]
+                raw_message['envelope']['syncMessage']['sentMessage']
             )
             mentions = cls._parse_mentions(
-                raw_message["envelope"]["syncMessage"]["sentMessage"]
+                raw_message['envelope']['syncMessage']['sentMessage']
             )
 
         # Option 2: dataMessage
-        elif "dataMessage" in raw_message["envelope"]:
+        elif 'dataMessage' in raw_message['envelope']:
             type = MessageType.DATA_MESSAGE
-            text = cls._parse_data_message(raw_message["envelope"]["dataMessage"])
-            group = cls._parse_group_information(raw_message["envelope"]["dataMessage"])
-            reaction = cls._parse_reaction(raw_message["envelope"]["dataMessage"])
-            mentions = cls._parse_mentions(raw_message["envelope"]["dataMessage"])
+            text = cls._parse_data_message(
+                raw_message['envelope']['dataMessage']
+            )
+            group = cls._parse_group_information(
+                raw_message['envelope']['dataMessage']
+            )
+            reaction = cls._parse_reaction(
+                raw_message['envelope']['dataMessage']
+            )
+            mentions = cls._parse_mentions(
+                raw_message['envelope']['dataMessage']
+            )
 
         else:
             raise UnknownMessageFormatError
@@ -131,7 +141,7 @@ class Message(BaseMessage):
     @classmethod
     def _parse_sync_message(cls, sync_message: dict) -> str:
         try:
-            text = sync_message["sentMessage"]["message"]
+            text = sync_message['sentMessage']['message']
             return text
         except Exception:
             raise UnknownMessageFormatError
@@ -139,7 +149,7 @@ class Message(BaseMessage):
     @classmethod
     def _parse_data_message(cls, data_message: dict) -> str:
         try:
-            text = data_message["message"]
+            text = data_message['message']
             return text
         except Exception:
             raise UnknownMessageFormatError
@@ -148,7 +158,7 @@ class Message(BaseMessage):
     def _parse_group_information(self, message: dict) -> Union[str, None]:
         ### should return a GROUP object not a str
         try:
-            group = message["groupInfo"]["groupId"]
+            group = message['groupInfo']['groupId']
             return group
         except Exception:
             return None
@@ -156,7 +166,7 @@ class Message(BaseMessage):
     @classmethod
     def _parse_mentions(cls, data_message: dict) -> list[Mention]:
         try:
-            mentions = data_message["mentions"]
+            mentions = data_message['mentions']
             return mentions
         except Exception:
             return []
@@ -164,7 +174,7 @@ class Message(BaseMessage):
     @classmethod
     def _parse_reaction(self, message: dict) -> Union[str, None]:
         try:
-            reaction = message["reaction"]["emoji"]
+            reaction = message['reaction']['emoji']
             return reaction
         except Exception:
             return None
@@ -178,7 +188,7 @@ class SendMessage(BaseMessage):
     quote_timestamp: str = None
     recipients: list[str]
     sticker: str = None
-    text_mode: str = "normal"
+    text_mode: str = 'normal'
 
 
 class SuccessfulSendMessageResponse(BaseModel):

@@ -32,3 +32,11 @@ class GroupsError(Exception):
 
 class StorageError(Exception):
     pass
+
+
+class SignalBotError(Exception):
+    pass
+
+
+class CommandError(Exception):
+    pass

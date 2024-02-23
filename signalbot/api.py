@@ -1,5 +1,6 @@
 import aiohttp
 import websockets
+from aiohttp import ClientResponse
 
 from signalbot.errors import (
     GroupsError,
@@ -9,7 +10,7 @@ from signalbot.errors import (
     ReactionError,
     ReceiveMessagesError,
 )
-from signalbot.models import Group, Reaction
+from signalbot.models import Group, Reaction, SendMessage, TypingIndicator
 
 
 class SignalAPI:
@@ -22,8 +23,6 @@ class SignalAPI:
         self.phone_number = phone_number
         self.connection = None
 
-        # self.session = aiohttp.ClientSession()
-
     async def receive(self):
         try:
             uri = self._receive_ws_uri()
@@ -35,45 +34,12 @@ class SignalAPI:
         except Exception as e:
             raise ReceiveMessagesError(e)
 
-    async def send(
-        self,
-        receiver: str,
-        message: str,
-        base64_attachments: list = None,
-        quote_author: str = None,
-        quote_mentions: list = None,
-        quote_message: str = None,
-        quote_timestamp: str = None,
-        mentions: list = None,
-        text_mode: str = None,
-    ) -> aiohttp.ClientResponse:
+    async def send_message(self, message: SendMessage) -> ClientResponse:
         uri = self._send_rest_uri()
-        if base64_attachments is None:
-            base64_attachments = []
-
-        payload = {
-            'base64_attachments': base64_attachments,
-            'message': message,
-            'number': self.phone_number,
-            'recipients': [receiver],
-        }
-
-        if quote_author:
-            payload['quote_author'] = quote_author
-        if quote_mentions:
-            payload['quote_mentions'] = quote_mentions
-        if quote_message:
-            payload['quote_message'] = quote_message
-        if quote_timestamp:
-            payload['quote_timestamp'] = quote_timestamp
-        if mentions:
-            payload['mentions'] = mentions
-        if text_mode:
-            payload['text_mode'] = text_mode
 
         try:
             async with aiohttp.ClientSession() as session:
-                resp = await session.post(uri, json=payload)
+                resp = await session.post(uri, json=message)
                 resp.raise_for_status()
                 return resp
         except (
@@ -83,7 +49,7 @@ class SignalAPI:
         ):
             raise SendMessageError
 
-    async def react(self, reaction: Reaction) -> aiohttp.ClientResponse:
+    async def react(self, reaction: Reaction) -> ClientResponse:
         uri = self._react_rest_uri()
         try:
             async with aiohttp.ClientSession() as session:
@@ -96,11 +62,9 @@ class SignalAPI:
         ):
             raise ReactionError
 
-    async def start_typing(self, receiver: str):
+    async def start_typing(self, receiver: str) -> ClientResponse:
         uri = self._typing_indicator_uri()
-        payload = {
-            'recipient': receiver,
-        }
+        payload = TypingIndicator(recipient=receiver)
         try:
             async with aiohttp.ClientSession() as session:
                 resp = await session.put(uri, json=payload)
@@ -112,11 +76,9 @@ class SignalAPI:
         ):
             raise StartTypingError
 
-    async def stop_typing(self, receiver: str):
+    async def stop_typing(self, receiver: str) -> ClientResponse:
         uri = self._typing_indicator_uri()
-        payload = {
-            'recipient': receiver,
-        }
+        payload = TypingIndicator(recipient=receiver)
         try:
             async with aiohttp.ClientSession() as session:
                 resp = await session.delete(uri, json=payload)

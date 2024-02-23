@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import re
 import time
 import traceback
 from collections import defaultdict
@@ -12,9 +11,10 @@ from .api import SignalAPI, ReceiveMessagesError
 from .command import Command
 from .context import Context
 from .errors import UnknownMessageFormatError
-from .models import Message, Reaction
+from .models import Message, Reaction, SendMessage
 from .storage.base_storage import BaseStorage
 from .storage.memory_storage import InMemoryStorage
+from .utils.util_functions import is_phone_number, is_group_id, is_internal_id
 
 
 class SignalBot:
@@ -68,20 +68,20 @@ class SignalBot:
         )
 
         # Case 1: required id is a phone number, optional_id is not being used
-        if self._is_phone_number(required_id):
+        if is_phone_number(required_id):
             phone_number = required_id
             self._listenUser(phone_number)
             return
 
         # Case 2: required id is a group id
-        if self._is_group_id(required_id) and self._is_internal_id(optional_id):
+        if is_group_id(required_id) and is_internal_id(optional_id):
             group_id = required_id
             internal_id = optional_id
             self._listenGroup(group_id, internal_id)
             return
 
         # Case 3: optional_id is a group id (Case 2 swapped)
-        if self._is_internal_id(required_id) and self._is_group_id(optional_id):
+        if is_internal_id(required_id) and is_group_id(optional_id):
             group_id = optional_id
             internal_id = required_id
             self._listenGroup(group_id, internal_id)
@@ -102,7 +102,7 @@ class SignalBot:
     # deprecated
     def _listenUser(self, phone_number: str):
         self._listen_mode_activated = True
-        if not self._is_phone_number(phone_number):
+        if not is_phone_number(phone_number):
             logging.warning(
                 "[Bot] Can't listen for user because phone number does not look valid"
             )
@@ -121,7 +121,7 @@ class SignalBot:
     # deprecated
     def _listenGroup(self, group_id: str, internal_id: str = None):
         self._listen_mode_activated = True
-        if not (self._is_group_id(group_id) and self._is_internal_id(internal_id)):
+        if not (is_group_id(group_id) and is_internal_id(internal_id)):
             logging.warning(
                 "[Bot] Can't listen for group because group id and "
                 "internal id do not look valid"
@@ -148,7 +148,7 @@ class SignalBot:
         if isinstance(groups, list):
             group_ids = []
             for group in groups:
-                if self._is_group_id(group):  # group is a group id, higher prio
+                if is_group_id(group):  # group is a group id, higher prio
                     group_ids.append(group)
                 else:  # group is a group name
                     for matched_group in self._groups_by_name:
@@ -168,39 +168,16 @@ class SignalBot:
         # Run event loop
         self._event_loop.run_forever()
 
-    async def send(
-        self,
-        receiver: str,
-        text: str,
-        base64_attachments: list = None,
-        quote_author: str = None,
-        quote_mentions: list = None,
-        quote_message: str = None,
-        quote_timestamp: str = None,
-        mentions: list = None,
-        text_mode: str = None,
-        listen: bool = False,
-    ) -> int:
-        receiver = self._resolve_receiver(receiver)
-        resp = await self._signal.send(
-            receiver,
-            text,
-            base64_attachments=base64_attachments,
-            quote_author=quote_author,
-            quote_mentions=quote_mentions,
-            quote_message=quote_message,
-            quote_timestamp=quote_timestamp,
-            mentions=mentions,
-            text_mode=text_mode,
-        )
+    async def send(self, receiver: str, send_message_object: SendMessage) -> None:
+        receiver_resolved = self._resolve_receiver(receiver)
+        send_message_object.recipients = [receiver_resolved]
+        resp = await self._signal.send_message(message=send_message_object)
+
         resp_payload = await resp.json()
         timestamp = resp_payload["timestamp"]
-        logging.info(f"[Bot] New message {timestamp} sent:\n{text}")
-
-        if listen:
-            logging.warning("[Bot] send(..., listen=True) is not supported anymore")
-
-        return timestamp
+        logging.info(
+            f"[Bot] New message {timestamp} sent:\n{send_message_object.message}"
+        )
 
     async def react(self, message: Message, emoji: str) -> None:
         # TODO: check that emoji is really an emoji
@@ -215,11 +192,11 @@ class SignalBot:
         await self._signal.react(reaction)
         logging.info(f"[Bot] New reaction: {emoji}")
 
-    async def start_typing(self, receiver: str):
+    async def start_typing(self, receiver: str) -> None:
         receiver = self._resolve_receiver(receiver)
         await self._signal.start_typing(receiver)
 
-    async def stop_typing(self, receiver: str):
+    async def stop_typing(self, receiver: str) -> None:
         receiver = self._resolve_receiver(receiver)
         await self._signal.stop_typing(receiver)
 
@@ -238,10 +215,10 @@ class SignalBot:
         logging.info(f"[Bot] {len(self.groups)} groups detected")
 
     def _resolve_receiver(self, receiver: str) -> str:
-        if self._is_phone_number(receiver):
+        if is_phone_number(receiver):
             return receiver
 
-        if self._is_group_id(receiver):
+        if is_group_id(receiver):
             return receiver
 
         try:
@@ -250,34 +227,6 @@ class SignalBot:
 
         except Exception:
             raise SignalBotError("Cannot resolve receiver.")
-
-    def _is_phone_number(self, phone_number: str) -> bool:
-        if phone_number is None:
-            return False
-        if phone_number[0] != "+":
-            return False
-        if len(phone_number[1:]) > 15:
-            return False
-        return True
-
-    def _is_group_id(self, group_id: str) -> bool:
-        """Check if group_id has the right format, e.g.
-
-              random string                                              length 66
-              ↓                                                          ↓
-        group.OyZzqio1xDmYiLsQ1VsqRcUFOU4tK2TcECmYt2KeozHJwglMBHAPS7jlkrm=
-        ↑                                                                ↑
-        prefix                                                           suffix
-        """
-        if group_id is None:
-            return False
-
-        return re.match(r"^group\.[a-zA-Z0-9]{59}=$", group_id)
-
-    def _is_internal_id(self, internal_id: str) -> bool:
-        if internal_id is None:
-            return False
-        return internal_id[-1] == "="
 
     # see https://stackoverflow.com/questions/55184226/catching-exceptions-in-individual-tasks-and-restarting-them
     @classmethod

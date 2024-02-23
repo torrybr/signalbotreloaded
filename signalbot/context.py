@@ -1,5 +1,5 @@
 # from .bot import Signalbot # TODO: figure out how to enable this for typing
-from .models import Message
+from .models import Message, SendMessage
 
 
 class Context:
@@ -14,12 +14,16 @@ class Context:
         mentions: list = None,
         text_mode: str = None,
     ):
-        return await self.bot.send(
-            self.message.recipient(),
-            text,
+
+        send_message_object = SendMessage(
+            message=text,
+            number=self.message.recipient(),
             base64_attachments=base64_attachments,
             mentions=mentions,
             text_mode=text_mode,
+        )
+        return await self.bot.send(
+            receiver=self.message.recipient(), message=send_message_object
         )
 
     async def reply(
@@ -29,16 +33,21 @@ class Context:
         mentions: list = None,
         text_mode: str = None,
     ):
-        return await self.bot.send(
-            self.message.recipient(),
-            text,
-            base64_attachments=base64_attachments,
+
+        send_message_object = SendMessage(
+            message=text,
+            number=self.message.recipient(),
             quote_author=self.message.source,
             quote_mentions=self.message.mentions,
             quote_message=self.message.text,
             quote_timestamp=self.message.timestamp,
+            base64_attachments=base64_attachments,
             mentions=mentions,
             text_mode=text_mode,
+        )
+
+        return await self.bot.send(
+            receiver=self.message.recipient(), message=send_message_object
         )
 
     async def react(self, emoji: str):
